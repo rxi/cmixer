@@ -431,13 +431,18 @@ void cm_set_gain(cm_Source *src, double gain) {
 
 
 void cm_set_pan(cm_Source *src, double pan) {
-  src->pan = pan;
+  src->pan = CLAMP(pan, -1.0, 1.0);
   recalc_source_gains(src);
 }
 
 
 void cm_set_pitch(cm_Source *src, double pitch) {
-  double rate = src->samplerate / (double) cmixer.samplerate * pitch;
+  double rate;
+  if (pitch > 0.) {
+    rate = src->samplerate / (double) cmixer.samplerate * pitch;
+  } else {
+    rate = 0.001;
+  }
   src->rate = FX_FROM_FLOAT(rate);
 }
 
