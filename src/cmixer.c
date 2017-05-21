@@ -154,6 +154,11 @@ static void process_source(cm_Source *src, int len) {
     rewind_source(src);
   }
 
+  /* Don't process if not playing */
+  if (src->state != CM_STATE_PLAYING) {
+    return;
+  }
+
   /* Process audio */
   while (len > 0) {
     /* Get current position frame */
