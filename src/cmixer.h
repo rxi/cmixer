@@ -8,7 +8,7 @@
 #ifndef CMIXER_H
 #define CMIXER_H
 
-#define CM_VERSION "0.1.0"
+#define CM_VERSION "0.1.1"
 
 typedef short           cm_Int16;
 typedef int             cm_Int32;
