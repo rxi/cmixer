@@ -389,6 +389,7 @@ void cm_destroy_source(cm_Source *src) {
         *s = src->next;
         break;
       }
+      s = &((*s)->next);
     }
   }
   unlock();
