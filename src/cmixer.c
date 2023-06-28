@@ -98,7 +98,7 @@ const char* cm_get_error(void) {
 }
 
 
-static const char* error(const char *msg) {
+static const char* cm_error(const char *msg) {
   cmixer.lasterror = msg;
   return msg;
 }
@@ -263,7 +263,7 @@ void cm_process(cm_Int16 *dst, int len) {
 cm_Source* cm_new_source(const cm_SourceInfo *info) {
   cm_Source *src = calloc(1, sizeof(*src));
   if (!src) {
-    error("allocation failed");
+    cm_error("allocation failed");
     return NULL;
   }
   src->handler = info->handler;
@@ -314,7 +314,7 @@ static cm_Source* new_source_from_mem(void *data, int size, int ownsdata) {
   }
 #endif
 
-  error("unknown format or invalid data");
+  cm_error("unknown format or invalid data");
   return NULL;
 }
 
@@ -359,7 +359,7 @@ cm_Source* cm_new_source_from_file(const char *filename) {
   /* Load file into memory */
   data = load_file(filename, &size);
   if (!data) {
-    error("could not load file");
+    cm_error("could not load file");
     return NULL;
   }
 
@@ -517,12 +517,12 @@ static const char* read_wav(Wav *w, void *data, int len) {
 
   /* Check header */
   if (memcmp(p, "RIFF", 4) || memcmp(p + 8, "WAVE", 4)) {
-    return error("bad wav header");
+    return cm_error("bad wav header");
   }
   /* Find fmt subchunk */
   p = find_subchunk(data, len, "fmt", &sz);
   if (!p) {
-    return error("no fmt subchunk");
+    return cm_error("no fmt subchunk");
   }
 
   /* Load fmt info */
@@ -531,16 +531,16 @@ static const char* read_wav(Wav *w, void *data, int len) {
   samplerate  = *((cm_UInt32*) (p + 4));
   bitdepth    = *((cm_UInt16*) (p + 14));
   if (format != 1) {
-    return error("unsupported format");
+    return cm_error("unsupported format");
   }
   if (channels == 0 || samplerate == 0 || bitdepth == 0) {
-    return error("bad format");
+    return cm_error("bad format");
   }
 
   /* Find data subchunk */
   p = find_subchunk(data, len, "data", &sz);
   if (!p) {
-    return error("no data subchunk");
+    return cm_error("no data subchunk");
   }
 
   /* Init struct */
@@ -625,12 +625,12 @@ static const char* wav_init(cm_SourceInfo *info, void *data, int len, int ownsda
   }
 
   if (wav.channels > 2 || (wav.bitdepth != 16 && wav.bitdepth != 8)) {
-    return error("unsupported wav format");
+    return cm_error("unsupported wav format");
   }
 
   stream = calloc(1, sizeof(*stream));
   if (!stream) {
-    return error("allocation failed");
+    return cm_error("allocation failed");
   }
   stream->wav = wav;
 
@@ -656,7 +656,7 @@ static const char* wav_init(cm_SourceInfo *info, void *data, int len, int ownsda
 #ifdef CM_USE_STB_VORBIS
 
 #define STB_VORBIS_HEADER_ONLY
-#include "stb_vorbis.c"
+#include "../../stb/stb_vorbis.c"
 
 typedef struct {
   stb_vorbis *ogg;
@@ -708,13 +708,13 @@ static const char* ogg_init(cm_SourceInfo *info, void *data, int len, int ownsda
 
   ogg = stb_vorbis_open_memory(data, len, &err, NULL);
   if (!ogg) {
-    return error("invalid ogg data");
+    return cm_error("invalid ogg data");
   }
 
   stream = calloc(1, sizeof(*stream));
   if (!stream) {
     stb_vorbis_close(ogg);
-    return error("allocation failed");
+    return cm_error("allocation failed");
   }
 
   stream->ogg = ogg;
