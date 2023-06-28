@@ -656,7 +656,7 @@ static const char* wav_init(cm_SourceInfo *info, void *data, int len, int ownsda
 #ifdef CM_USE_STB_VORBIS
 
 #define STB_VORBIS_HEADER_ONLY
-#include "../../stb/stb_vorbis.c"
+#include "stb_vorbis.c"
 
 typedef struct {
   stb_vorbis *ogg;
